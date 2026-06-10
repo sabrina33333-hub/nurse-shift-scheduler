@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>護理師列表</title>
+</head>
+<body>
+    <h1>護理師列表</h1>
+    <a href="/members/add">新增護理師</a>
+
+    <table border="1">
+        <tr>
+            <th>員工編號</th>
+            <th>姓名</th>
+            <th>年資</th>
+            <th>資深</th>
+        </tr>
+        <tr th:each="member : ${members}">
+            <td th:text="${member.id}"></td>
+            <td th:text="${member.name}"></td>
+            <td th:text="${member.yearOfService}"></td>
+            <td th:text="${member.isSenior ? '是' : '否'}"></td>
+        </tr>
+    </table>
+</body>
+</html>

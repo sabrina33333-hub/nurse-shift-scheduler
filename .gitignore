@@ -1,0 +1,21 @@
+# Maven 編譯產出
+target/
+*.class
+
+# 其他練習檔
+other/
+
+# 本機設定（含資料庫密碼，不上傳）
+src/main/resources/application.properties
+
+# Claude Code
+.claude/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.DS_Store
+
+# 測試用 Excel 檔
+*.xlsx
