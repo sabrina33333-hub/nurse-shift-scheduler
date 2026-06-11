@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>新增護理師</title>
+</head>
+<body>
+    <h1>新增護理師</h1>
+
+    <form th:action="@{/members/add}" th:object="${member}" method="post">
+        <label>姓名：<input type="text" th:field="*{name}" /></label><br>
+        <label>年資：<input type="number" th:field="*{yearOfService}" /></label><br>
+        <label>資深：<input type="checkbox" th:field="*{senior}" /></label><br>
+        <button type="submit">送出</button>
+    </form>
+</body>
+</html>
