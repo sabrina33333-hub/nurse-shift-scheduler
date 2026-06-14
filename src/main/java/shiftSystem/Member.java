@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
@@ -12,6 +14,7 @@ import jakarta.persistence.Transient;
 public class Member {
     
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private String name;
     private String password;
@@ -49,13 +52,14 @@ public class Member {
     public void setOvertimeHours(double overtimeHours){ this.overtimeHours = overtimeHours;}
     public void setDominantShift( ShiftType dominantShift){ this.dominantShift = dominantShift;}
     public void setAnnualLeave(int annualLeaveBalance){this.annualLeaveBalance = annualLeaveBalance;}
-    
+    public void setSenior(boolean isSenior){this.isSenior = isSenior;}
     public boolean checkPassword(String input) {
         return this.password.equals(input);
     }
 
 
 
+    
     public Member(String id,String name,String password,int yearOfService){
         this.id = id;
         this.name = name;
