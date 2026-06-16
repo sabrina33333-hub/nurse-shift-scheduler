@@ -18,29 +18,65 @@ public class ShiftScheduler {
         this.nurse = members;
         allShifts = new ArrayList<>();
     }
-    
+
    public static <T> List<T> getRandomOrderList(List<T> inputList) {
         List<T> newList = new ArrayList<>(inputList);
-        
-        Collections.shuffle(newList);
-        
-        return newList;
-    } 
-    
 
-    
+        Collections.shuffle(newList);
+
+        return newList;
+    }
+
+    private  boolean  canAsign(Member member,boolean checkPreD,boolean checkPreE,
+        boolean checkPreN,ShiftItem preD, ShiftItem preE,ShiftItem preN,ArrayList<Member> signedMembers,int day){
+            if(signedMembers.contains(member)){return false;}
+            if(checkPreD && preD != null && preD.getNurse().contains(member)){return false;}
+            if(checkPreE && preE != null && preE.getNurse().contains(member)){return false;}
+            if(checkPreN && preN != null && preN.getNurse().contains(member)){return false;}
+            if(isPreferredOff (member,day)){return false;}
+            if(row4(member, day)>=6 ){return false;}
+            return true;
+
+        }
+    private int fillShift(List<Member> nurse2,ShiftItem shiftItem,boolean checkPreD,boolean checkPreE,
+        boolean checkPreN,ShiftItem preD, ShiftItem preE,ShiftItem preN,ArrayList<Member> signedMembers,int day,int count,int maxCount){
+
+             for(int d = 0;d <nurse2.size() && count< maxCount ;d++ ){
+                Member member = nurse2.get(d);
+                if(member.isSenior() && canAsign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
+                    shiftItem.addNurse(member);
+                    signedMembers.add(member);
+                    count ++;
+                    break;
+                }
+
+             }
+
+             for(int d = 0;d <nurse2.size() && count< maxCount ;d++ ){
+                Member member = nurse2.get(d);
+                if( canAsign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
+                    shiftItem.addNurse(member);
+                    signedMembers.add(member);
+                    count ++;
+
+                }
+
+             }
+             return count;
+        }
+
     //產出班別
     public void makeShift(){
-        int total= nurse.size();
         
+
         for(int i =0;i< shift.getStartDate().lengthOfMonth();i++){
             ArrayList<Member> signedMembers = new ArrayList<>();
             ShiftItem D = new ShiftItem(shift.getStartDate().plusDays(i), ShiftType.DAY);
             ShiftItem E = new ShiftItem(shift.getStartDate().plusDays(i), ShiftType.EVENING);
             ShiftItem N = new ShiftItem(shift.getStartDate().plusDays(i), ShiftType.NIGHT);
             List<Member> nurse2= getRandomOrderList(nurse);//打亂的人員排序
-            
-            
+
+
             //Row1 不能「大夜接白班」
             //Row2不能「小夜接白班」
             ShiftItem preN = null;
@@ -58,11 +94,11 @@ public class ShiftScheduler {
             //R3 OFF 前後不能夾 1 天班
             for(Member member:nurse2){
                 if(i>=2 &&(!isOff(allShifts, i-1, member))&&(isOff(allShifts, i-2, member))){
-                    if(preN.getNurse().contains(member)){
+                    if(preN != null && preN.getNurse().contains(member) ){
                         N.addNurse(member);
                         signedMembers.add(member);
                         ncount ++;
-                    }else if(preE.getNurse().contains(member)){
+                    }else if(preE != null&& preE.getNurse().contains(member)){
                         E.addNurse(member);
                         signedMembers.add(member);
                         ecount ++;
@@ -70,109 +106,50 @@ public class ShiftScheduler {
                         D.addNurse(member);
                         signedMembers.add(member);
                         dcount ++;
-                        
+
                     }
                 }
             }
-            
+
 
             //白班
-            
-           
-            for(int d =0;d <total&& dcount<3;d++){
-                Member member = nurse2.get(d); 
-             
-                if(!signedMembers.contains(member)&&(preN == null || !preN.getNurse().contains(member))
-                    &&( preE==null || !preE.getNurse().contains(member))&& (row4(member, i)<6 && member.isSenior() 
-                &&!isPreferredOff(member, i))){
-                    D.addNurse(member);
-                    signedMembers.add(member);
-                    dcount++;
-                    break;
-                }
-            }
-            
-            for(int d =0;d <total&& dcount<3;d++){
-                Member member = nurse2.get(d); 
-             
-                if(!signedMembers.contains(member)&&(preN == null || !preN.getNurse().contains(member))
-                    &&( preE==null || !preE.getNurse().contains(member))&& row4(member, i)<6 &&!isPreferredOff(member, i)){
-                    D.addNurse(member);
-                    signedMembers.add(member);
-                    dcount++;
-                    
-                }
-            }
+
+
+            fillShift(nurse2,D,false,true,true,preD, preE, preN, signedMembers,i,dcount,3);
+
             if(!hasSenior(D.getNurse())){
                 throw new IllegalStateException(i+"日，白班沒有資深人員！");
             }
-            
+
 
             // 小夜班
-            
-            for(int e=0; e<total && ecount<2;e++){
-                Member member = nurse2.get(e); 
-                if(!signedMembers.contains(member)&& row4(member, i)<6 && member.isSenior() 
-                    &&!isPreferredOff(member, i)){
-                E.addNurse(member);
-                signedMembers.add(member);
-                ecount++;
-                break;
-                }
-            }
-            for(int e=0; e<total && ecount<2;e++){
-                Member member = nurse2.get(e); 
-                if(!signedMembers.contains(member)&& row4(member, i)<6 &&!isPreferredOff(member, i)){
-                E.addNurse(member);
-                signedMembers.add(member);
-                ecount++;
-                
-                }
-            }
+
+            fillShift(nurse2,E,false,false,false,preD, preE, preN, signedMembers,i,ecount,2);
+
             if(!hasSenior(E.getNurse())){
                 throw new IllegalStateException(i+"日，小夜班沒有資深人員！");
             }
 
             //大夜班   R8 | 白班、小夜班不能接大夜班
-            
-            for(int n=0; n<total && ncount<1;n++){
-                Member member = nurse2.get(n); 
-                if(!signedMembers.contains(member)&& (preE==null||!preE.getNurse().contains(member) ) 
-                    &&(preD == null || !preD.getNurse().contains(member))&& row4(member, i)<6 && member.isSenior() 
-                    &&!isPreferredOff(member, i)){
-                N.addNurse(member);
-                signedMembers.add(member);
-                ncount++;
-                break;
-                }
-            } 
-            for(int n=0; n<total && ncount<1;n++){
-                Member member = nurse2.get(n); 
-                if(!signedMembers.contains(member)&& (preE==null||!preE.getNurse().contains(member) ) 
-                    &&(preD == null || !preD.getNurse().contains(member))&& row4(member, i)<6 
-                    &&!isPreferredOff(member, i)){
-                N.addNurse(member);
-                signedMembers.add(member);
-                ncount++;
-                
-                }
-            }  
+
+            fillShift(nurse2,N,true,true,false,preD, preE, preN, signedMembers,i,ncount,1);
+
             if(!hasSenior(N.getNurse())){
                 throw new IllegalStateException(i+"日，大夜班沒有資深人員！");
             }
-            
+
             allShifts.add(D);
             allShifts.add(E);
             allShifts.add(N);
-            
+
         }
-        
+
     }
 
     private boolean isPreferredOff(Member member,int day){
         LocalDate date = shift.getStartDate().plusDays(day);
-        return member.preferredAnnualLeave.contains(date)||
-        member.preferredOvertimeLeave.contains(date);
+        return member.getPreferredAL().contains(date)||
+        member.getPreferredOTL().contains(date);
     }
 
     private boolean isOff(List<ShiftItem> allShifts, int day, Member member) {
@@ -197,12 +174,12 @@ public class ShiftScheduler {
         }
         return count;
     }
-   
 
 
-    
-    
-    
+
+
+
+
 
     public boolean hasSenior(List<Member> members){
         for(Member m: members){
@@ -213,5 +190,5 @@ public class ShiftScheduler {
         return false;
 
     }
-   
+
 }

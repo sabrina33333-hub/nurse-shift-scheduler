@@ -24,11 +24,11 @@ public class Member {
     private int annualLeaveBalance; //特休餘額
     
     @Transient
-    ArrayList<LocalDate>preferredAnnualLeave; //預排公休
+    private ArrayList<LocalDate>preferredAnnualLeave; //預排公休
     private double overtimeHours;  //加班時數累計
     
     @Transient
-    ArrayList<LocalDate> preferredOvertimeLeave;
+    private  ArrayList<LocalDate> preferredOvertimeLeave;
     @Enumerated(EnumType.STRING)
     private ShiftType dominantShift; //包班
     
