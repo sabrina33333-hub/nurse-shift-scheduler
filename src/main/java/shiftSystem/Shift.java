@@ -27,16 +27,5 @@ public class Shift {
         this.shiftList.add(shiftItem);
     }
 
-    // //public void generateShiftItems(){
-    //     int m = startDate.lengthOfMonth();
-    //     for(int n =1; n<=m ;n++){
-            
-    //         ShiftItem DAY = new ShiftItem(startDate.plusDays(n-1),ShiftType.DAY);
-    //         ShiftItem EVENING = new ShiftItem(startDate.plusDays(n-1), ShiftType.EVENING);
-    //         ShiftItem NIGHT = new ShiftItem(startDate.plusDays(n-1), ShiftType.NIGHT);
-    //         addShiftItem(DAY);
-    //         addShiftItem(EVENING);
-    //         addShiftItem(NIGHT);
-    //     }
-     //   }
+    
 }
