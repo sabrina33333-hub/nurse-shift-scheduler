@@ -1,7 +1,9 @@
 package shiftSystem;
 
-import java.util.ArrayList;
 import java.time.LocalDate;
+import java.util.ArrayList;
+
+import shiftSystem.entity.ShiftItem;
 //空班表（預班表）
 public class Shift {
     private LocalDate startDate;

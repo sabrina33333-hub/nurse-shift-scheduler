@@ -1,4 +1,4 @@
-package shiftSystem;
+package shiftSystem.service;
 
 
 import java.time.LocalDate;
@@ -6,12 +6,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import shiftSystem.Shift;
+import shiftSystem.ShiftType;
+import shiftSystem.entity.Member;
+import shiftSystem.entity.ShiftItem;
+
 
 
 public class ShiftScheduler {
     Shift shift;
     ArrayList<Member> nurse;
     List<ShiftItem> allShifts;
+
+    private static final int DAY_COUNT = 3;
+    private static final int EVENING_COUNT =2;
+    private static final int NIGHT_COUNT = 1;
+
+    public List<ShiftItem> getAllShifts(){ return  allShifts;}
 
     public ShiftScheduler(Shift shift,ArrayList<Member> members){
         this.shift = shift;
@@ -27,7 +38,7 @@ public class ShiftScheduler {
         return newList;
     }
 
-    private  boolean  canAsign(Member member,boolean checkPreD,boolean checkPreE,
+    private  boolean  canAssign(Member member,boolean checkPreD,boolean checkPreE,
         boolean checkPreN,ShiftItem preD, ShiftItem preE,ShiftItem preN,ArrayList<Member> signedMembers,int day){
             if(signedMembers.contains(member)){return false;}
             if(checkPreD && preD != null && preD.getNurse().contains(member)){return false;}
@@ -43,7 +54,7 @@ public class ShiftScheduler {
 
              for(int d = 0;d <nurse2.size() && count< maxCount ;d++ ){
                 Member member = nurse2.get(d);
-                if(member.isSenior() && canAsign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
+                if(member.isSenior() && canAssign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
                     shiftItem.addNurse(member);
                     signedMembers.add(member);
                     count ++;
@@ -54,7 +65,7 @@ public class ShiftScheduler {
 
              for(int d = 0;d <nurse2.size() && count< maxCount ;d++ ){
                 Member member = nurse2.get(d);
-                if( canAsign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
+                if( canAssign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
                     shiftItem.addNurse(member);
                     signedMembers.add(member);
                     count ++;
@@ -115,7 +126,7 @@ public class ShiftScheduler {
             //白班
 
 
-            fillShift(nurse2,D,false,true,true,preD, preE, preN, signedMembers,i,dcount,3);
+            fillShift(nurse2,D,false,true,true,preD, preE, preN, signedMembers,i,dcount,DAY_COUNT);
 
             if(!hasSenior(D.getNurse())){
                 throw new IllegalStateException(i+"日，白班沒有資深人員！");
@@ -124,7 +135,7 @@ public class ShiftScheduler {
 
             // 小夜班
 
-            fillShift(nurse2,E,false,false,false,preD, preE, preN, signedMembers,i,ecount,2);
+            fillShift(nurse2,E,false,false,false,preD, preE, preN, signedMembers,i,ecount,EVENING_COUNT);
 
             if(!hasSenior(E.getNurse())){
                 throw new IllegalStateException(i+"日，小夜班沒有資深人員！");
@@ -132,7 +143,7 @@ public class ShiftScheduler {
 
             //大夜班   R8 | 白班、小夜班不能接大夜班
 
-            fillShift(nurse2,N,true,true,false,preD, preE, preN, signedMembers,i,ncount,1);
+            fillShift(nurse2,N,true,true,false,preD, preE, preN, signedMembers,i,ncount,NIGHT_COUNT);
 
             if(!hasSenior(N.getNurse())){
                 throw new IllegalStateException(i+"日，大夜班沒有資深人員！");

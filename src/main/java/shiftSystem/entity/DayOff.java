@@ -1,6 +1,8 @@
-package shiftSystem;
+package shiftSystem.entity;
 
 import java.time.LocalDate;
+
+import shiftSystem.DayOffStatus;
 
 public class DayOff {
     private Member applicant;

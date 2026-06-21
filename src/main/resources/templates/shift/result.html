@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>產出班表</title>
+</head>
+<body>
+    <h1>排班設定</h1>
+
+    <form th:action="@{/shift/generate}" method="post">
+       <table border="1">
+    <tr>
+        <th>姓名</th>
+        <!-- 日期標題：1, 2, 3... -->
+        <th th:each="day : ${#numbers.sequence(1, shift.startDate.lengthOfMonth())}"
+            th:text="${day}">1</th>
+    </tr>
+    <tr th:each="member : ${members}">
+        <td th:text="${member.name}">護理師</td>
+        <!-- 每天的班別 -->
+        <td th:each="day : ${#numbers.sequence(0, shift.startDate.lengthOfMonth()-1)}">
+            ...
+        </td>
+    </tr>
+</table>
+
+    </form>
+</body>
+</html>

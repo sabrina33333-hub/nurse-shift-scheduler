@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>產出班表</title>
+</head>
+<body>
+    <h1>排班設定</h1>
+
+    <form th:action="@{/shift/generate}" method="post">
+    <label>年份：<input type="number" name="year" /></label><br>
+    <label>月份：<input type="number" name="month" min="1" max="12" /></label><br>
+    <label>病房名稱：<input type="text" name="wardName" /></label><br>
+    <button type="submit">產出班表</button>
+</form>
+</body>
+</html>
+
+
+
+

@@ -1,4 +1,4 @@
-package shiftSystem;
+package shiftSystem.entity;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -8,7 +8,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PostLoad;
 import jakarta.persistence.Transient;
+import shiftSystem.ShiftType;
 
 @Entity
 public class Member {
@@ -35,6 +37,13 @@ public class Member {
     @Transient
     private ArrayList<Member> delegateList; //職務代理人清單
 
+
+    @PostLoad
+    private void init(){
+        if(preferredAnnualLeave == null) preferredAnnualLeave = new ArrayList<>();
+        if(preferredOvertimeLeave == null) preferredOvertimeLeave = new ArrayList<>();
+        if(delegateList == null) delegateList = new ArrayList<>();
+    }
     public String getName(){return this.name;}
     public String getId(){ return this.id;}
     public int getYearOfService(){ return this.yearOfService;}
