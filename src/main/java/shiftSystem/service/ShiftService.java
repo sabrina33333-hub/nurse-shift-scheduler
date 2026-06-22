@@ -2,7 +2,7 @@ package shiftSystem.service;
 
 import org.springframework.stereotype.Service;
 
-import shiftSystem.service.ShiftScheduler;  // 需要加這行
+import shiftSystem.service.ShiftScheduler;  
 
 import shiftSystem.ExcelExporter;
 import shiftSystem.Shift;
@@ -46,6 +46,8 @@ public class ShiftService {
 
             exporter.exportShift(shift, members, shiftScheduler.getAllShifts(), holidays, filePath);
             System.out.println("班表已產生！");
+
+            MemberSchedule memberSchedule = new MemberSchedule(member,shift);
 
             return new ScheduleResult(shift, members,shiftScheduler.getAllShifts());
             

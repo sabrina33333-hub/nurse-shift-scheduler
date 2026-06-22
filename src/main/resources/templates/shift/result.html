@@ -15,13 +15,13 @@
         <th th:each="day : ${#numbers.sequence(1, shift.startDate.lengthOfMonth())}"
             th:text="${day}">1</th>
     </tr>
-    <tr th:each="member : ${members}">
-        <td th:text="${member.name}">護理師</td>
-        <!-- 每天的班別 -->
-        <td th:each="day : ${#numbers.sequence(0, shift.startDate.lengthOfMonth()-1)}">
-            ...
-        </td>
+    
+        <tr th:each="ms : ${memberSchedules}">
+        <td th:text="${ms.member.name}">護理師</td>
+        <td th:each="shift : ${ms.shifts}" th:text="${shift}"></td>
+
     </tr>
+    
 </table>
 
     </form>

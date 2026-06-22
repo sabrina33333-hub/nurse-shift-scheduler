@@ -1,13 +1,21 @@
-package shiftSystem;
+package shiftSystem.entity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 import shiftSystem.entity.ShiftItem;
-//空班表（預班表）
+
+@Entity
 public class Shift {
+
+    @id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
     private LocalDate startDate;
     private String wardName;
+
+    @OneToMany(cascade = CascadeType.ALL)
     private ArrayList<ShiftItem> shiftList;
 
     public LocalDate getStartDate(){return this.startDate;}
@@ -18,6 +26,8 @@ public class Shift {
 
 
 
+    public Shift(){}
+    
     public Shift(LocalDate startDate,String wardName){
         this.startDate = startDate;
         this.wardName = wardName;
