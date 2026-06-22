@@ -1,9 +1,9 @@
 package shiftSystem.dto;
 
-import shiftSystem.Shift;
-import shiftSystem.entity.Member;
-import shiftSystem.entity.ShiftItem;
 import java.util.List;
+
+import shiftSystem.entity.Member;
+import shiftSystem.entity.Shift;
 
 public class ScheduleResult {
     public final Shift shift;

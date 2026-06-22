@@ -1,7 +1,8 @@
-pakege shiftSystem.util;
+package shiftSystem.util;
+import java.util.List;
+
 import shiftSystem.entity.Member;
 import shiftSystem.entity.ShiftItem;
-
 public class ShiftCodeResolver{
 
     public static  String getShiftCode(List<ShiftItem> allShifts, int day, Member member) {
@@ -11,6 +12,6 @@ public class ShiftCodeResolver{
         if(d.getNurse().contains(member)){return "D" ;
         }else if(e.getNurse().contains(member)){return "E" ;
         }else if(n.getNurse().contains(member)){return "N" ;
-        }else{return "OFF"}
+        }else{return "OFF";}
     }
 }

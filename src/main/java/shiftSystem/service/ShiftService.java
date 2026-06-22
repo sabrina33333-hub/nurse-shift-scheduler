@@ -1,30 +1,33 @@
 package shiftSystem.service;
 
-import org.springframework.stereotype.Service;
-
-import shiftSystem.service.ShiftScheduler;  
-
-import shiftSystem.ExcelExporter;
-import shiftSystem.Shift;
-import shiftSystem.entity.Member;
-import shiftSystem.repository.MemberRepository;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import shiftSystem.ExcelExporter;
 import shiftSystem.dto.MemberSchedule;
 import shiftSystem.dto.ScheduleResult;
-import shiftService.util.ShiftCodeResolver;
+import shiftSystem.entity.Member;
+import shiftSystem.entity.Shift;
+import shiftSystem.entity.ShiftItem;
+import shiftSystem.repository.MemberRepository;
+import shiftSystem.repository.ShiftRepository;
+import shiftSystem.util.ShiftCodeResolver;
 
 @Service
 public class ShiftService {
 
     private final MemberRepository memberRepository;
+    private final ShiftRepository shiftRepository;
 
-    public ShiftService(MemberRepository memberRepository){
+    public ShiftService(MemberRepository memberRepository , ShiftRepository shiftRepository){
         this.memberRepository = memberRepository;
+        this.shiftRepository = shiftRepository;
     }
+    
 
     public ScheduleResult generateSchedule(int year, int month , String wardName)throws IOException {
        
@@ -37,6 +40,7 @@ public class ShiftService {
             //跑排班
             ShiftScheduler shiftScheduler = new ShiftScheduler(shift, members);
             shiftScheduler.makeShift();
+            shiftRepository.save(shift);
 
             List<LocalDate> holidays = new ArrayList<>();
             holidays.add(LocalDate.of(2026,5,6));//國定假日設定
@@ -50,7 +54,7 @@ public class ShiftService {
 
             
 
-            return new ScheduleResult(shift, members,shiftScheduler.getAllShifts());
+            return new ScheduleResult(shift, members,buildMemberSchedules(members,shiftScheduler.getAllShifts(),LocalDate.of(year, month, 1).lengthOfMonth()));
             
     }
 
@@ -60,7 +64,7 @@ public class ShiftService {
     for (Member member : members) {
         List<String> shifts = new ArrayList<>();
         for (int day = 0; day < daysInMonth; day++) {
-            shift.add(ShiftCodeResolver.getShiftCode(allShifts, day, member));
+            shifts.add(ShiftCodeResolver.getShiftCode(allShifts, day, member));
         }
         result.add(new MemberSchedule(member, shifts));
     }

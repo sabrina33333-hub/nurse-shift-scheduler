@@ -4,7 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import shiftSystem.util.ShiftCodeResolver; 
+ 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -12,7 +12,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import shiftSystem.entity.Member;
+import shiftSystem.entity.Shift;
 import shiftSystem.entity.ShiftItem;
+import shiftSystem.util.ShiftCodeResolver;
 
 //空班表
 public class ExcelExporter {
@@ -132,7 +134,7 @@ public class ExcelExporter {
 
             for(int j =0; j < shift.getStartDate().lengthOfMonth();j++){
                 String code = ShiftCodeResolver.getShiftCode(allShifts, j, members.get(i));
-                cellD.setCellValue(code);
+                nameRow.createCell(j+1).setCellValue(code);
             }
         }
         

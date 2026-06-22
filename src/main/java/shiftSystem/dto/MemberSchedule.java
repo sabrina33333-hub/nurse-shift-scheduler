@@ -1,7 +1,7 @@
 package shiftSystem.dto;
-import shiftSystem.Shift;
-import shiftSystem.entity.Member;
 import java.util.List;
+
+import shiftSystem.entity.Member;
 
 public class MemberSchedule{
     

@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import shiftSystem.Shift;
 import shiftSystem.ShiftType;
 import shiftSystem.entity.Member;
+import shiftSystem.entity.Shift;
 import shiftSystem.entity.ShiftItem;
 
 
@@ -152,6 +152,10 @@ public class ShiftScheduler {
             allShifts.add(D);
             allShifts.add(E);
             allShifts.add(N);
+            shift.addShiftItem(D);
+            shift.addShiftItem(E);
+            shift.addShiftItem(N);
+
 
         }
 

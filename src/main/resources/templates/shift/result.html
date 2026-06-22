@@ -7,7 +7,7 @@
 <body>
     <h1>排班設定</h1>
 
-    <form th:action="@{/shift/generate}" method="post">
+    
        <table border="1">
     <tr>
         <th>姓名</th>
@@ -23,7 +23,8 @@
     </tr>
     
 </table>
+    <a th:href="@{/shift/download(id=${shift.id})}">下載 Excel</a>
 
-    </form>
+
 </body>
 </html>

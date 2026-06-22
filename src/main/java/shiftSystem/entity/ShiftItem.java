@@ -2,7 +2,7 @@ package shiftSystem.entity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-
+import java.util.List;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,13 +27,13 @@ public class ShiftItem {
     private ShiftType shiftType;
 
     @ManyToMany
-    private ArrayList<Member> itemNurse;
+    private List<Member> itemNurse;
 
     public ShiftItem(){}
 
     public LocalDate getDate(){ return this.date;}
     public ShiftType getShiftType(){ return this.shiftType;}
-    public ArrayList<Member> getNurse(){ return this.itemNurse;}
+    public List<Member> getNurse(){ return this.itemNurse;}
 
     public void addNurse(Member member){this.itemNurse.add(member);}
     public void removeNurse(Member member){this.itemNurse.remove(member);}

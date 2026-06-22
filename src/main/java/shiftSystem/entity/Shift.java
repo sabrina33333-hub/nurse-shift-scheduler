@@ -1,14 +1,20 @@
 package shiftSystem.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ArrayList;
 
-import shiftSystem.entity.ShiftItem;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Shift {
 
-    @id
+    @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
@@ -16,11 +22,13 @@ public class Shift {
     private String wardName;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private ArrayList<ShiftItem> shiftList;
+    private List<ShiftItem> shiftList;
+
+    public String getId(){ return this.id; }
 
     public LocalDate getStartDate(){return this.startDate;}
     public String getWardName(){ return this.wardName;}
-    public ArrayList<ShiftItem> getShiftList(){ return this.shiftList;}
+    public List<ShiftItem> getShiftList(){ return this.shiftList;}
 
     public void setWardName(String wardName){ this.wardName = wardName;}
 
