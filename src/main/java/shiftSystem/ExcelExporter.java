@@ -4,7 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
- 
+import shiftSystem.util.ShiftCodeResolver; 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -131,28 +131,8 @@ public class ExcelExporter {
 
 
             for(int j =0; j < shift.getStartDate().lengthOfMonth();j++){
-                ShiftItem d = allShifts.get(j*3);
-                ShiftItem e = allShifts.get(j*3+1);
-                ShiftItem n = allShifts.get(j*3+2);
-                if(d.getNurse().contains(members.get(i))){
-                    Cell cellD = nameRow.createCell(j+1);
-                    String D ="D";
-                    cellD.setCellValue(D);                
-                    
-                }else if(e.getNurse().contains(members.get(i))){
-                    Cell cellD = nameRow.createCell(j+1);
-                    String E ="E";
-                    cellD.setCellValue(E);
-                    
-                }else if(n.getNurse().contains(members.get(i))){
-                    Cell cellD = nameRow.createCell(j+1);
-                    String N ="N";
-                    cellD.setCellValue(N);
-                }else{
-                    Cell cellOff = nameRow.createCell(j+1);
-                    String off = "Off";
-                    cellOff.setCellValue(off);
-                }
+                String code = ShiftCodeResolver.getShiftCode(allShifts, j, members.get(i));
+                cellD.setCellValue(code);
             }
         }
         

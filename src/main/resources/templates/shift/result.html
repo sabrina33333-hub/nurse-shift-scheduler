@@ -18,7 +18,7 @@
     
         <tr th:each="ms : ${memberSchedules}">
         <td th:text="${ms.member.name}">護理師</td>
-        <td th:each="shift : ${ms.shifts}" th:text="${shift}"></td>
+        <td th:each="shift : ${ms.shift}" th:text="${shift}"></td>
 
     </tr>
     

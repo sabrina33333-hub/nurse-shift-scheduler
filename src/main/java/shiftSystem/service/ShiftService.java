@@ -13,8 +13,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import shiftSystem.dto.MemberSchedule;
 import shiftSystem.dto.ScheduleResult;
+import shiftService.util.ShiftCodeResolver;
 
 @Service
 public class ShiftService {
@@ -47,11 +48,24 @@ public class ShiftService {
             exporter.exportShift(shift, members, shiftScheduler.getAllShifts(), holidays, filePath);
             System.out.println("班表已產生！");
 
-            MemberSchedule memberSchedule = new MemberSchedule(member,shift);
+            
 
             return new ScheduleResult(shift, members,shiftScheduler.getAllShifts());
             
     }
+
+    private List<MemberSchedule> buildMemberSchedules(List<Member> members, 
+        List<ShiftItem> allShifts, int daysInMonth) {
+    List<MemberSchedule> result = new ArrayList<>();
+    for (Member member : members) {
+        List<String> shifts = new ArrayList<>();
+        for (int day = 0; day < daysInMonth; day++) {
+            shift.add(ShiftCodeResolver.getShiftCode(allShifts, day, member));
+        }
+        result.add(new MemberSchedule(member, shifts));
+    }
+    return result;
+}
     
     
 
