@@ -36,7 +36,7 @@ public class ShiftController {
             ScheduleResult result = shiftService.generateSchedule(year,month,wardName);
             //存 DB
             model.addAttribute("members", result.members);
-            model.addAttribute("allShifts",result.allShifts);
+            model.addAttribute("allShifts",result.memberSchedules);
             model.addAttribute("shift",result.shift);
             
         return "shift/result";
