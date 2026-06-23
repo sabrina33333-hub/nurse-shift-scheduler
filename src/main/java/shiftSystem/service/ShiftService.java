@@ -1,9 +1,12 @@
 package shiftSystem.service;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import java.nio.file.Path;
 
 import org.springframework.stereotype.Service;
 
@@ -42,14 +45,14 @@ public class ShiftService {
             shiftScheduler.makeShift();
             shiftRepository.save(shift);
 
-            List<LocalDate> holidays = new ArrayList<>();
-            holidays.add(LocalDate.of(2026,5,6));//國定假日設定
+            //List<LocalDate> holidays = new ArrayList<>();
+            //holidays.add(LocalDate.of(2026,5,6));//國定假日設定
             String filePath = "/tmp/" + wardName + "_" + year + month + ".xlsx";
             ExcelExporter exporter = new ExcelExporter();
 
             
 
-            exporter.exportShift(shift, members, shiftScheduler.getAllShifts(), holidays, filePath);
+            exporter.exportShift(shift, members, shiftScheduler.getAllShifts(), new ArrayList<>(), filePath);
             System.out.println("班表已產生！");
 
             
@@ -60,16 +63,28 @@ public class ShiftService {
 
     private List<MemberSchedule> buildMemberSchedules(List<Member> members, 
         List<ShiftItem> allShifts, int daysInMonth) {
-    List<MemberSchedule> result = new ArrayList<>();
-    for (Member member : members) {
-        List<String> shifts = new ArrayList<>();
-        for (int day = 0; day < daysInMonth; day++) {
-            shifts.add(ShiftCodeResolver.getShiftCode(allShifts, day, member));
+        List<MemberSchedule> result = new ArrayList<>();
+        for (Member member : members) {
+            List<String> shifts = new ArrayList<>();
+            for (int day = 0; day < daysInMonth; day++) {
+                shifts.add(ShiftCodeResolver.getShiftCode(allShifts, day, member));
+            }
+            result.add(new MemberSchedule(member, shifts));
         }
-        result.add(new MemberSchedule(member, shifts));
+        return result;
     }
-    return result;
-}
+
+    public byte[] downloadSchedule(String id) throws IOException{
+        Shift shift=  shiftRepository.findById(id).orElseThrow();
+        List<Member> members = memberRepository.findAll();
+        
+        String filePath = "/tmp/download_" +id +".xlsx" ;
+        new ExcelExporter().exportShift(shift, members, shift.getShiftList(), new ArrayList<>(), filePath);
+        byte[]  fileContent =Files.readAllBytes(Path.of(filePath));
+
+        return fileContent;
+    }
+
     
     
 

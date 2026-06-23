@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderColumn;
 
 @Entity
 public class Shift {
@@ -22,6 +23,7 @@ public class Shift {
     private String wardName;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @OrderColumn(name = "shift_order")
     private List<ShiftItem> shiftList;
 
     public String getId(){ return this.id; }
