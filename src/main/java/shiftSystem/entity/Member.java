@@ -24,6 +24,7 @@ public class Member {
     private int yearOfService;
     private boolean isSenior; //年資>=3年 為true
     private int annualLeaveBalance; //特休餘額
+    private boolean active = true;
     
     @Transient
     private ArrayList<LocalDate>preferredAnnualLeave; //預排公休
@@ -54,6 +55,7 @@ public class Member {
     public int getAnnualLeave(){ return annualLeaveBalance;}
     public ArrayList<LocalDate> getPreferredAL(){return preferredAnnualLeave;}
     public ArrayList<LocalDate> getPreferredOTL(){return preferredOvertimeLeave;}
+    public boolean isActive(){ return this.active;}
 
     public void setName(String name){this.name = name;}
     public void setPassword(String password){ this.password = password;}
@@ -62,6 +64,7 @@ public class Member {
     public void setDominantShift( ShiftType dominantShift){ this.dominantShift = dominantShift;}
     public void setAnnualLeave(int annualLeaveBalance){this.annualLeaveBalance = annualLeaveBalance;}
     public void setSenior(boolean isSenior){this.isSenior = isSenior;}
+    public void setActive(boolean active){this.active = active;}
     public boolean checkPassword(String input) {
         return this.password.equals(input);
     }

@@ -6,11 +6,14 @@ import java.util.List;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import shiftSystem.entity.Member;
 import shiftSystem.repository.MemberRepository;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -25,7 +28,7 @@ public class MemberController {
 
     @GetMapping
     public String list(Model model) {
-        List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findByActiveTrue();
         model.addAttribute("members",members);
         return  "members/list";
     }
@@ -39,6 +42,15 @@ public class MemberController {
     @PostMapping("/add")
     public String addMember(@ModelAttribute Member member) {
         memberRepository.save(member);
+        return "redirect:/members";
+    }
+    
+    @PostMapping("/delete/{id}")
+    public String deleteMember(@PathVariable String id) {
+        Member member = memberRepository.findById(id).orElseThrow();
+        member.setActive(false);
+        memberRepository.save(member);
+        
         return "redirect:/members";
     }
     

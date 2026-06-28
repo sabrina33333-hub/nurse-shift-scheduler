@@ -1,12 +1,13 @@
 package shiftSystem.service;
 
+
 import java.io.IOException;
-import java.nio.file.Files;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.nio.file.Path;
+
 
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,8 @@ import shiftSystem.entity.ShiftItem;
 import shiftSystem.repository.MemberRepository;
 import shiftSystem.repository.ShiftRepository;
 import shiftSystem.util.ShiftCodeResolver;
+import java.io.ByteArrayOutputStream;
+
 
 @Service
 public class ShiftService {
@@ -38,21 +41,14 @@ public class ShiftService {
             Shift shift = new Shift(LocalDate.of(year,month, 1),wardName);
 
             // DB 讀 members
-            ArrayList<Member> members = new ArrayList<>(memberRepository.findAll());
+            ArrayList<Member> members = new ArrayList<>(memberRepository.findByActiveTrue());
 
             //跑排班
             ShiftScheduler shiftScheduler = new ShiftScheduler(shift, members);
             shiftScheduler.makeShift();
             shiftRepository.save(shift);
 
-            //List<LocalDate> holidays = new ArrayList<>();
-            //holidays.add(LocalDate.of(2026,5,6));//國定假日設定
-            String filePath = "/tmp/" + wardName + "_" + year + month + ".xlsx";
-            ExcelExporter exporter = new ExcelExporter();
-
             
-
-            exporter.exportShift(shift, members, shiftScheduler.getAllShifts(), new ArrayList<>(), filePath);
             System.out.println("班表已產生！");
 
             
@@ -77,12 +73,10 @@ public class ShiftService {
     public byte[] downloadSchedule(String id) throws IOException{
         Shift shift=  shiftRepository.findById(id).orElseThrow();
         List<Member> members = memberRepository.findAll();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new ExcelExporter().exportShift(shift,  members,shift.getShiftList(), new ArrayList<>(),out);
+        return out.toByteArray();
         
-        String filePath = "/tmp/download_" +id +".xlsx" ;
-        new ExcelExporter().exportShift(shift, members, shift.getShiftList(), new ArrayList<>(), filePath);
-        byte[]  fileContent =Files.readAllBytes(Path.of(filePath));
-
-        return fileContent;
     }
 
     

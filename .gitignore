@@ -7,6 +7,7 @@ other/
 
 # 本機設定（含資料庫密碼，不上傳）
 src/main/resources/application.properties
+.env
 
 # Claude Code
 .claude/

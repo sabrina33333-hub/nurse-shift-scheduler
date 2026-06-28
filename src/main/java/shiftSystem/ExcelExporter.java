@@ -15,6 +15,8 @@ import shiftSystem.entity.Member;
 import shiftSystem.entity.Shift;
 import shiftSystem.entity.ShiftItem;
 import shiftSystem.util.ShiftCodeResolver;
+import java.io.OutputStream;
+
 
 //空班表
 public class ExcelExporter {
@@ -79,7 +81,7 @@ public class ExcelExporter {
     }
 
     //產出實際班表
-    public void exportShift(Shift shift, List<Member> members,List<ShiftItem> allShifts,List<LocalDate> holidays,  String filePath)throws IOException{
+    public void exportShift(Shift shift, List<Member> members,List<ShiftItem> allShifts,List<LocalDate> holidays,  OutputStream out)throws IOException{
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("班表");
         int year = shift.getStartDate().getYear()-1911;
@@ -139,9 +141,9 @@ public class ExcelExporter {
         }
         
         
-        FileOutputStream fos = new FileOutputStream(filePath);
-        workbook.write(fos);
-        fos.close();
+        
+        workbook.write(out);
+        
         workbook.close();
 
     
