@@ -36,24 +36,35 @@ public class ShiftService {
     
 
     public ScheduleResult generateSchedule(int year, int month , String wardName)throws IOException {
-       
-        //建立shift物件
-            Shift shift = new Shift(LocalDate.of(year,month, 1),wardName);
+       // DB 讀 members
+        ArrayList<Member> members = new ArrayList<>(memberRepository.findByActiveTrue());
 
-            // DB 讀 members
-            ArrayList<Member> members = new ArrayList<>(memberRepository.findByActiveTrue());
+        
+        
+        for(int attemp =1 ;attemp <=1000; attemp++){
+            try{
+                //建立shift物件
+                Shift shift = new Shift(LocalDate.of(year,month, 1),wardName); 
+                //跑排班
+                ShiftScheduler shiftScheduler = new ShiftScheduler(shift, members);
+                shiftScheduler.makeShift();
+                
+                shiftRepository.save(shift);
 
-            //跑排班
-            ShiftScheduler shiftScheduler = new ShiftScheduler(shift, members);
-            shiftScheduler.makeShift();
-            shiftRepository.save(shift);
+                
+                System.out.println("班表已產生！");
 
             
-            System.out.println("班表已產生！");
 
-            
+                return new ScheduleResult(shift, members,buildMemberSchedules(members,shiftScheduler.getAllShifts(),
+                LocalDate.of(year, month, 1).lengthOfMonth()));
+                }catch(IllegalStateException e){
+                    System.out.println("班表已產生失敗！");
+                }
+        }
+        throw new IllegalStateException ("失敗！ 在職<7 或 資深<4!");
+        
 
-            return new ScheduleResult(shift, members,buildMemberSchedules(members,shiftScheduler.getAllShifts(),LocalDate.of(year, month, 1).lengthOfMonth()));
             
     }
 
