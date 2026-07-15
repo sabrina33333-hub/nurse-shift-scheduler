@@ -34,12 +34,29 @@ public class ShiftService {
         this.shiftRepository = shiftRepository;
     }
     
+    public int countSenior(List<Member> members){
+            int count =0;
+            for(Member m: members){
+                
+                if (m.isSenior()){
+                
+                count ++;
+                }
+            }return count;
+    }
 
     public ScheduleResult generateSchedule(int year, int month , String wardName)throws IOException {
        // DB 讀 members
         ArrayList<Member> members = new ArrayList<>(memberRepository.findByActiveTrue());
+        if(members.size()<7){
+            throw new IllegalStateException ("人力不足7人! 共"+members.size()+"人！");
+        }else if(countSenior(members)<4){
+            throw new IllegalStateException ("資深人力不足4人,僅"+countSenior(members)+"人！");
+        };
+    
+     
 
-        
+    
         
         for(int attemp =1 ;attemp <=1000; attemp++){
             try{
@@ -58,11 +75,11 @@ public class ShiftService {
 
                 return new ScheduleResult(shift, members,buildMemberSchedules(members,shiftScheduler.getAllShifts(),
                 LocalDate.of(year, month, 1).lengthOfMonth()));
-                }catch(IllegalStateException e){
-                    System.out.println("班表已產生失敗！");
+                 }catch(IllegalStateException e){
+                    System.out.println("第"+ attemp +"次班表產生失敗！");
                 }
         }
-        throw new IllegalStateException ("失敗！ 在職<7 或 資深<4!");
+        throw new IllegalStateException ("沒有好的組合班表！");
         
 
             
@@ -83,7 +100,7 @@ public class ShiftService {
 
     public byte[] downloadSchedule(String id) throws IOException{
         Shift shift=  shiftRepository.findById(id).orElseThrow();
-        List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findByActiveTrue();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         new ExcelExporter().exportShift(shift,  members,shift.getShiftList(), new ArrayList<>(),out);
         return out.toByteArray();
