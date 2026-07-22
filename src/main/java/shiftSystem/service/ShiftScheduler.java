@@ -105,15 +105,15 @@ public class ShiftScheduler {
             //R3 OFF 前後不能夾 1 天班
             for(Member member:nurse2){
                 if(i>=2 &&(!isOff(allShifts, i-1, member))&&(isOff(allShifts, i-2, member))){
-                    if(preN != null && preN.getNurse().contains(member) ){
+                    if(preN != null && preN.getNurse().contains(member) && ncount < NIGHT_COUNT){
                         N.addNurse(member);
                         signedMembers.add(member);
                         ncount ++;
-                    }else if(preE != null&& preE.getNurse().contains(member)){
+                    }else if(preE != null&& preE.getNurse().contains(member) && ecount < EVENING_COUNT){
                         E.addNurse(member);
                         signedMembers.add(member);
                         ecount ++;
-                    }else{
+                    }else if(dcount < DAY_COUNT){
                         D.addNurse(member);
                         signedMembers.add(member);
                         dcount ++;
