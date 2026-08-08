@@ -11,12 +11,46 @@ import shiftSystem.entity.Member;
 import shiftSystem.entity.Shift;
 import shiftSystem.entity.ShiftItem;
 
+class DayContext{
+    List<Member> candidates; //nurse2
+    ShiftItem preD,preE,preN;
+    ArrayList<Member> signedMembers;
+    int day;
 
+    public DayContext(List<Member> candidates,ShiftItem preD,ShiftItem preE,ShiftItem preN,ArrayList<Member> signedMembers,int day) {
+        this.candidates = candidates;
+        this.preD = preD;
+        this.preE = preE;
+        this.preN = preN;
+        this.signedMembers = signedMembers;
+        this.day = day;
+    }
+
+    
+}
+
+class ShiftSlot{
+    ShiftItem shiftItem; //D /E /N
+    boolean checkPreD,checkPreE,checkPreN;
+    int count;
+    int maxCount;
+
+    public ShiftSlot(ShiftItem shiftItem,boolean checkPreD,
+        boolean checkPreE,boolean checkPreN, int count,int maxCount){
+        
+        this.shiftItem = shiftItem;
+        this.checkPreD = checkPreD;
+        this.checkPreE = checkPreE;
+        this.checkPreN = checkPreN;
+        this.count = count;
+        this.maxCount = maxCount;
+    }
+}
 
 public class ShiftScheduler {
-    Shift shift;
-    ArrayList<Member> nurse;
-    List<ShiftItem> allShifts;
+    private Shift shift;
+    private ArrayList<Member> nurse;
+    private List<ShiftItem> allShifts;
 
     private static final int DAY_COUNT = 3;
     private static final int EVENING_COUNT =2;
@@ -24,6 +58,7 @@ public class ShiftScheduler {
 
     public List<ShiftItem> getAllShifts(){ return  allShifts;}
 
+    
     public ShiftScheduler(Shift shift,ArrayList<Member> members){
         this.shift = shift;
         this.nurse = members;
@@ -37,43 +72,45 @@ public class ShiftScheduler {
 
         return newList;
     }
-
-    private  boolean  canAssign(Member member,boolean checkPreD,boolean checkPreE,
-        boolean checkPreN,ShiftItem preD, ShiftItem preE,ShiftItem preN,ArrayList<Member> signedMembers,int day){
-            if(signedMembers.contains(member)){return false;}
-            if(checkPreD && preD != null && preD.getNurse().contains(member)){return false;}
-            if(checkPreE && preE != null && preE.getNurse().contains(member)){return false;}
-            if(checkPreN && preN != null && preN.getNurse().contains(member)){return false;}
-            if(isPreferredOff (member,day)){return false;}
-            if(row4(member, day)>=6 ){return false;}
+    
+    private  boolean  canAssign(Member member,DayContext dayContext,ShiftSlot slot){
+             
+            
+            
+            if(dayContext.signedMembers.contains(member)){return false;}
+            if(slot.checkPreD && dayContext.preD != null && dayContext.preD.getNurse().contains(member)){return false;}
+            if(slot.checkPreE && dayContext.preE != null && dayContext.preE.getNurse().contains(member)){return false;}
+            if(slot.checkPreN && dayContext.preN != null && dayContext.preN.getNurse().contains(member)){return false;}
+            if(isPreferredOff (member,dayContext.day)){return false;}
+            if(row4(member, dayContext.day)>=6 ){return false;}
             return true;
 
         }
-    private int fillShift(List<Member> nurse2,ShiftItem shiftItem,boolean checkPreD,boolean checkPreE,
-        boolean checkPreN,ShiftItem preD, ShiftItem preE,ShiftItem preN,ArrayList<Member> signedMembers,int day,int count,int maxCount){
 
-             for(int d = 0;d <nurse2.size() && count< maxCount ;d++ ){
-                Member member = nurse2.get(d);
-                if(member.isSenior() && canAssign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
-                    shiftItem.addNurse(member);
-                    signedMembers.add(member);
-                    count ++;
+    private int fillShift(DayContext dayContext ,ShiftSlot slot){
+
+             for(int d = 0;d < dayContext.candidates.size() && slot.count< slot.maxCount ;d++ ){
+                Member member = dayContext.candidates.get(d);
+                if(member.isSenior() && canAssign(member,dayContext,slot)){
+                    slot.shiftItem.addNurse(member);
+                    dayContext.signedMembers.add(member);
+                    slot.count ++;
                     break;
                 }
 
              }
 
-             for(int d = 0;d <nurse2.size() && count< maxCount ;d++ ){
-                Member member = nurse2.get(d);
-                if( canAssign(member,checkPreD,checkPreE,checkPreN, preD, preE, preN,signedMembers,day)){
-                    shiftItem.addNurse(member);
-                    signedMembers.add(member);
-                    count ++;
+             for(int d = 0;d < dayContext.candidates.size() && slot.count< slot.maxCount ;d++ ){
+                Member member = dayContext.candidates.get(d);
+                if(canAssign(member, dayContext, slot)){
+                    slot.shiftItem.addNurse(member);
+                    dayContext.signedMembers.add(member);
+                    slot.count ++;
 
                 }
 
              }
-             return count;
+             return slot.count;
         }
 
     //產出班別
@@ -102,6 +139,7 @@ public class ShiftScheduler {
             int ncount =0;
             int ecount =0;
             int dcount =0;
+            
             //R3 OFF 前後不能夾 1 天班
             for(Member member:nurse2){
                 if(i>=2 &&(!isOff(allShifts, i-1, member))&&(isOff(allShifts, i-2, member))){
@@ -125,8 +163,11 @@ public class ShiftScheduler {
 
             //白班
 
-
-            fillShift(nurse2,D,false,true,true,preD, preE, preN, signedMembers,i,dcount,DAY_COUNT);
+            DayContext dayContext =new DayContext(nurse2,preD,preE,preN,signedMembers,i);
+            ShiftSlot dSlot = new ShiftSlot( D, false, true, true,dcount, DAY_COUNT);
+                        
+            fillShift(dayContext,dSlot);
+            
 
             if(!hasSenior(D.getNurse())){
                 throw new IllegalStateException(i+"日，白班沒有資深人員！");
@@ -134,16 +175,20 @@ public class ShiftScheduler {
 
 
             // 小夜班
-
-            fillShift(nurse2,E,false,false,false,preD, preE, preN, signedMembers,i,ecount,EVENING_COUNT);
+            
+            ShiftSlot eSlot = new ShiftSlot( E, false, false, false,ecount, EVENING_COUNT);
+            
+            fillShift(dayContext,eSlot);
 
             if(!hasSenior(E.getNurse())){
                 throw new IllegalStateException(i+"日，小夜班沒有資深人員！");
             }
 
             //大夜班   R8 | 白班、小夜班不能接大夜班
-
-            fillShift(nurse2,N,true,true,false,preD, preE, preN, signedMembers,i,ncount,NIGHT_COUNT);
+            
+            ShiftSlot nSlot = new ShiftSlot( N, true, true, false,ncount, NIGHT_COUNT);
+            
+            fillShift(dayContext,nSlot);
 
             if(!hasSenior(N.getNurse())){
                 throw new IllegalStateException(i+"日，大夜班沒有資深人員！");
@@ -205,5 +250,8 @@ public class ShiftScheduler {
         return false;
 
     }
+
+    
+    
 
 }

@@ -1,13 +1,11 @@
 package shiftSystem.service;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-
 
 import org.springframework.stereotype.Service;
 
@@ -20,7 +18,6 @@ import shiftSystem.entity.ShiftItem;
 import shiftSystem.repository.MemberRepository;
 import shiftSystem.repository.ShiftRepository;
 import shiftSystem.util.ShiftCodeResolver;
-import java.io.ByteArrayOutputStream;
 
 
 @Service
@@ -84,7 +81,7 @@ public class ShiftService {
 
             
     }
-
+    
     private List<MemberSchedule> buildMemberSchedules(List<Member> members, 
         List<ShiftItem> allShifts, int daysInMonth) {
         List<MemberSchedule> result = new ArrayList<>();
