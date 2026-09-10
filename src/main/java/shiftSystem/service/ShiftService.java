@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import shiftSystem.ExcelExporter;
+import shiftSystem.ShiftType;
 import shiftSystem.dto.MemberSchedule;
 import shiftSystem.dto.ScheduleResult;
 import shiftSystem.entity.Member;
@@ -18,6 +19,7 @@ import shiftSystem.entity.ShiftItem;
 import shiftSystem.repository.MemberRepository;
 import shiftSystem.repository.ShiftRepository;
 import shiftSystem.util.ShiftCodeResolver;
+
 
 
 @Service
@@ -61,7 +63,10 @@ public class ShiftService {
                 Shift shift = new Shift(LocalDate.of(year,month, 1),wardName); 
                 //跑排班
                 ShiftScheduler shiftScheduler = new ShiftScheduler(shift, members);
-                shiftScheduler.makeShift();
+                boolean success = shiftScheduler.solve(0, ShiftType.DAY, 0);
+                if(!success){
+                    throw new IllegalStateException("排不出合法班表！");
+                }
                 
                 shiftRepository.save(shift);
 

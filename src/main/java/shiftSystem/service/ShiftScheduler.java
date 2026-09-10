@@ -4,7 +4,9 @@ package shiftSystem.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import shiftSystem.ShiftType;
 import shiftSystem.entity.Member;
@@ -51,7 +53,8 @@ public class ShiftScheduler {
     private Shift shift;
     private ArrayList<Member> nurse;
     private List<ShiftItem> allShifts;
-
+    private Map<String, ShiftItem> assignedShift = new HashMap<>();
+    
     private static final int DAY_COUNT = 3;
     private static final int EVENING_COUNT =2;
     private static final int NIGHT_COUNT = 1;
@@ -59,6 +62,7 @@ public class ShiftScheduler {
     public List<ShiftItem> getAllShifts(){ return  allShifts;}
 
     
+ 
     public ShiftScheduler(Shift shift,ArrayList<Member> members){
         this.shift = shift;
         this.nurse = members;
@@ -206,6 +210,77 @@ public class ShiftScheduler {
 
     }
 
+   boolean solve(int day, ShiftType shiftType, int count) {
+
+        if (day == shift.getStartDate().lengthOfMonth()) {
+            return true;  // 全部排完了
+        }
+        
+        
+        int maxCount = switch(shiftType){
+            case DAY ->3 ;
+            case EVENING ->2 ;
+            case NIGHT ->1;
+            default ->1;
+        };
+
+        if (count == maxCount) {
+        // 這個班次滿了，要換下一個目標（含是否有資深R5）
+            if (shiftType == ShiftType.DAY && hasSenior(getShiftItem(day,ShiftType.DAY).getNurse())) {
+                return solve(day, ShiftType.EVENING, 0);  // 換到「哪一天」的「哪個班別」，count 歸零
+            } else if(shiftType == ShiftType.EVENING && hasSenior(getShiftItem(day,ShiftType.EVENING).getNurse())) {
+                return solve( day, ShiftType.NIGHT, 0);  // 白班滿了換小夜、小夜滿了換大夜
+            }else if( hasSenior(getShiftItem(day,ShiftType.NIGHT).getNurse())){
+                return solve(day+1,ShiftType.DAY,0);
+            }return false;
+        }
+
+        // 還沒滿，繼續在同一個 (day, shiftType) 裡找下一個人
+        for (Member member : nurse) {
+            if (isValid(member, day, shiftType)) {
+                getShiftItem(day,shiftType).addNurse(member);
+                if (solve(day, shiftType, count+1)) {
+                    return true;
+                }
+                getShiftItem(day, shiftType).removeNurse(member);
+            }
+        }
+        return false;
+   }
+   
+   //是否能排白班
+    boolean isValid(Member member, int day,ShiftType shiftType){
+        //今天是否排過班
+        if(getShiftItem(day,ShiftType.DAY).getNurse().contains(member)|| getShiftItem(day,ShiftType.EVENING).getNurse().contains(member)
+            ||getShiftItem(day,ShiftType.NIGHT).getNurse().contains(member)){
+        return false;
+        
+        //前一天大夜、小夜是否有人 Ｒ1\R2 
+        // R4排班是否大於6天
+        }else if(day >= 1 && shiftType == ShiftType.DAY && (getShiftItem(day-1,ShiftType.NIGHT).getNurse().contains(member)||
+            getShiftItem(day-1, shiftType.EVENING).getNurse().contains(member))||(row4(member, day)>= 6)){ 
+            
+            return false;
+        }
+        
+
+        return true;
+
+    }
+ 
+        ShiftItem getShiftItem(int day,ShiftType shiftType){
+            String key = day+"_"+ shiftType;
+            ShiftItem item = assignedShift.get(key);
+            if(item == null){
+                item = new ShiftItem(shift.getStartDate().plusDays(day),shiftType);
+                assignedShift.put(key,item);
+                allShifts.add(item);
+                shift.addShiftItem(item);
+            }
+            return item;
+}
+
+    
     private boolean isPreferredOff(Member member,int day){
         LocalDate date = shift.getStartDate().plusDays(day);
         return member.getPreferredAL().contains(date)||
